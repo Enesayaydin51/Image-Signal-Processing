@@ -23,17 +23,14 @@ wheels/
 .installed.cfg
 *.egg
 
-# Görüntü sonuçları (çok büyük olabilir)
-results/
-*.jpg
-*.jpeg
-*.png
-*.bmp
+# Results klasöründeki görüntü dosyalarını ignore et (klasör yapısı eklenecek)
+results/**/*.jpg
+results/**/*.jpeg
+results/**/*.png
+results/**/*.bmp
+!results/**/.gitkeep
 
-# Veri seti görüntüleri hariç tutma (opsiyonel - isterseniz ekleyebilirsiniz)
-# dataset/*.jpg
-# dataset/*.jpeg
-# dataset/*.png
+# Dataset klasöründeki görüntüler eklenecek (ignore edilmiyor)
 
 # IDE
 .vscode/
