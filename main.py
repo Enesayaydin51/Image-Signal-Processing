@@ -48,29 +48,36 @@ def power_law_transformation(image, gamma=1.5):
     return enhanced_image
 
 
-def histogram_equalization(image):
+def clahe_enhancement(image):
     """
-    Histogram Equalization ile kontrast artırma
-    Bu yöntem görüntünün histogramını eşitleyerek kontrastı artırır.
-    
+    CLAHE (Contrast Limited Adaptive Histogram Equalization) ile kontrast artırma
+    Bu yöntem görüntünün lokal histogramını eşitleyerek kontrastı artırır ve
+    aşırı parlaklık oluşumunu sınırlar.
+
     Parametreler:
     ------------
     image : numpy.ndarray
         Giriş görüntüsü (BGR formatında)
-    
+
     Döndürür:
     --------
     enhanced_image : numpy.ndarray
-        Kontrast artırılmış görüntü
+        CLAHE uygulanmış kontrast artırılmış görüntü
     """
-    # Renkli görüntü için LAB renk uzayına dönüştür
-    # Sadece L (Lightness) kanalına histogram equalization uygula
-    # Sonra tekrar BGR'ye dönüştür
+
+    # Renkli görüntüyü LAB renk uzayına çevir
     lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
-    lab[:,:,0] = cv2.equalizeHist(lab[:,:,0])
-    enhanced_image = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
-    
-    return enhanced_image
+
+    # CLAHE objesi oluştur (clipLimit ve tileGridSize parametreleri ayarlanabilir)
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+
+    # Sadece parlaklık (L) kanalına CLAHE uygula
+    lab[:, :, 0] = clahe.apply(lab[:, :, 0])
+
+    # LAB renk uzayından tekrar BGR'ye çevir
+    clahe_image = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
+
+    return clahe_image
 
 
 def thresholding_enhancement(image, threshold_type='adaptive', max_value=255, block_size=11, C=2):
@@ -154,8 +161,8 @@ def create_comparison_image(original, power_law, histogram, thresholding, image_
         Orijinal görüntü (BGR)
     power_law : numpy.ndarray
         Power-Law Transformation sonucu (BGR)
-    histogram : numpy.ndarray
-        Histogram Equalization sonucu (BGR)
+    clahe : numpy.ndarray
+        Clahe Enhancement sonucu (BGR)
     thresholding : numpy.ndarray
         Thresholding sonucu (BGR)
     image_name : str
@@ -166,7 +173,7 @@ def create_comparison_image(original, power_law, histogram, thresholding, image_
     # BGR'den RGB'ye dönüştür (matplotlib için)
     original_rgb = cv2.cvtColor(original, cv2.COLOR_BGR2RGB)
     power_law_rgb = cv2.cvtColor(power_law, cv2.COLOR_BGR2RGB)
-    hist_rgb = cv2.cvtColor(histogram, cv2.COLOR_BGR2RGB)
+    clahe_rgb = cv2.cvtColor(histogram, cv2.COLOR_BGR2RGB)
     threshold_rgb = cv2.cvtColor(thresholding, cv2.COLOR_BGR2RGB)
     
     # 4 görseli yan yana göster
@@ -180,8 +187,8 @@ def create_comparison_image(original, power_law, histogram, thresholding, image_
     axes[1].set_title('Power-Law (γ=0.5)', fontsize=14, fontweight='bold')
     axes[1].axis('off')
     
-    axes[2].imshow(hist_rgb)
-    axes[2].set_title('Histogram Equalization', fontsize=14, fontweight='bold')
+    axes[2].imshow(clahe_rgb)
+    axes[2].set_title('Clahe Enhancement', fontsize=14, fontweight='bold')
     axes[2].axis('off')
     
     axes[3].imshow(threshold_rgb)
@@ -209,7 +216,7 @@ def process_dataset(dataset_folder="dataset", output_folder="results/dataset_res
     Path(output_folder).mkdir(parents=True, exist_ok=True)
     
     # Alt klasörleri oluştur
-    methods = ["power_law", "histogram", "thresholding"]
+    methods = ["power_law", "clahe", "thresholding"]
     for method in methods:
         Path(f"{output_folder}/{method}").mkdir(parents=True, exist_ok=True)
     
@@ -261,10 +268,10 @@ def process_dataset(dataset_folder="dataset", output_folder="results/dataset_res
             )
             
             # 2. Histogram Equalization
-            enhanced_hist = histogram_equalization(image)
+            enhanced_clahe = clahe_enhancement(image)
             cv2.imwrite(
-                f"{output_folder}/histogram/{image_name_no_ext}_histogram.jpg",
-                enhanced_hist
+                f"{output_folder}/clahe/{image_name_no_ext}_clahe.jpg",
+                enhanced_clahe
             )
             
             # 3. Thresholding
@@ -278,7 +285,7 @@ def process_dataset(dataset_folder="dataset", output_folder="results/dataset_res
             create_comparison_image(
                 image,
                 enhanced_power_law,
-                enhanced_hist,
+                enhanced_clahe,
                 enhanced_threshold,
                 image_name_no_ext,
                 f"{output_folder}/comparisons/{image_name_no_ext}_comparison.png"
@@ -293,7 +300,7 @@ def process_dataset(dataset_folder="dataset", output_folder="results/dataset_res
     print(f"\nIslem Tamamlandi!")
     print(f"Sonuclar: {output_folder}/")
     print(f"   ├── power_law/     ({len(image_files)} goruntu)")
-    print(f"   ├── histogram/     ({len(image_files)} goruntu)")
+    print(f"   ├── clahe/     ({len(image_files)} goruntu)")
     print(f"   ├── thresholding/  ({len(image_files)} goruntu)")
     print(f"   └── comparisons/   ({len(image_files)} karsilastirma gorseli)")
 
@@ -305,7 +312,7 @@ def create_sample_structure():
     folders = [
         "dataset",
         "results/dataset_results/power_law",
-        "results/dataset_results/histogram",
+        "results/dataset_results/clahe",
         "results/dataset_results/thresholding",
         "results/dataset_results/comparisons"
     ]
