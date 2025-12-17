@@ -32,6 +32,7 @@ pip install -r requirements.txt
 projectSC/
 │
 ├── main.py                    # Ana Python dosyası (tüm fonksiyonlar)
+├── demo_analysis.py           # Histogram ve CDF analiz grafikleri (Matematiksel analiz)
 ├── requirements.txt           # Gerekli kütüphaneler
 ├── README.md                  # Bu dosya
 ├── dataset_info.md            # Veri seti toplama rehberi
@@ -68,6 +69,10 @@ Tüm görüntülere yöntemleri uygulayın:
 ```bash
 python main.py
 ```
+Seçilen görüntüler üzerinde yöntemleri uygulayıp, histogramlarını çizin:
+```bash
+python demo_analysis.py
+```
 
 Bu komut:
 - `dataset/` klasöründeki tüm görüntüleri işler
@@ -95,6 +100,15 @@ enhanced_power_law = power_law_transformation(image, gamma=0.5)
 clahe_hist = clahe_enhancement(image)
 enhanced_threshold = thresholding_enhancement(image, threshold_type='adaptive')
 ```
+## 📈 Analiz ve Histogram Değerlendirmesi
+
+Proje kapsamında sadece görüntü iyileştirme yapılmamış, aynı zamanda algoritmaların başarısı Histogram ve CDF (Cumulative Distribution Function) analizleriyle doğrulanmıştır. demo_analysis.py dosyası ile üretilen grafikler şunları kanıtlar:
+
+- Kontrast Yayılımı: CLAHE ve Power-Law yöntemlerinin, dar bir alana sıkışmış piksel değerlerini (düşük kontrast) histogram üzerinde nasıl genişlettiği.
+
+- Parlaklık Değişimi: Histogramın koyu bölgelerden (sol taraf) aydınlık bölgelere (sağ taraf) nasıl kaydırıldığı.
+
+- CDF Doğrusallığı: İşlem sonrası CDF eğrisinin daha lineer hale gelmesi, görüntüdeki bilgi dağılımının dengelendiğini gösterir.
 
 ## 📖 Yöntemler
 
