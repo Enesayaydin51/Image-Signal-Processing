@@ -7,7 +7,7 @@ Bu proje, düşük ışıklı görüntüler için farklı kontrast artırma tekn
 Düşük ışıklı görüntülerde kontrast düşüktür ve görüntü kalitesi kötüleşir. Bu projede, görüntü kontrastını artırmak için üç farklı yöntem uygulanmaktadır:
 
 1. **Power-Law Transformation (Gamma Correction)** - Ana yöntem
-2. **Histogram Equalization** - Histogram eşitleme yöntemi
+2. **CLAHE (Contrast Limited Adaptive Histogram Equalization)** - CLAHE ile kontrast eşitleme yöntemi
 3. **Thresholding** - Eşik değeri yöntemi
 
 ## 🔧 Kurulum
@@ -32,6 +32,7 @@ pip install -r requirements.txt
 projectSC/
 │
 ├── main.py                    # Ana Python dosyası (tüm fonksiyonlar)
+├── demo_analysis.py           # Histogram ve CDF analiz grafikleri (Matematiksel analiz)
 ├── requirements.txt           # Gerekli kütüphaneler
 ├── README.md                  # Bu dosya
 ├── dataset_info.md            # Veri seti toplama rehberi
@@ -42,7 +43,7 @@ projectSC/
 └── results/                   # Sonuçlar (otomatik oluşturulur)
     └── dataset_results/
         ├── power_law/         # Power-Law Transformation sonuçları
-        ├── histogram/         # Histogram Equalization sonuçları
+        ├── clahe/             # CLAHE sonuçları
         ├── thresholding/      # Thresholding sonuçları
         └── comparisons/       # Karşılaştırma görselleri (orijinal + 3 yöntem)
 ```
@@ -68,6 +69,10 @@ Tüm görüntülere yöntemleri uygulayın:
 ```bash
 python main.py
 ```
+Seçilen görüntüler üzerinde yöntemleri uygulayıp, histogramlarını çizin:
+```bash
+python demo_analysis.py
+```
 
 Bu komut:
 - `dataset/` klasöründeki tüm görüntüleri işler
@@ -82,7 +87,7 @@ Eğer tek bir görüntü üzerinde test yapmak isterseniz:
 ```python
 from main import (
     power_law_transformation,
-    histogram_equalization,
+    clahe_enhancement,
     thresholding_enhancement,
     load_image
 )
@@ -92,15 +97,24 @@ image = load_image("your_image.jpg")
 
 # Yöntemleri uygula
 enhanced_power_law = power_law_transformation(image, gamma=0.5)
-enhanced_hist = histogram_equalization(image)
+clahe_hist = clahe_enhancement(image)
 enhanced_threshold = thresholding_enhancement(image, threshold_type='adaptive')
 ```
+## 📈 Analiz ve Histogram Değerlendirmesi
+
+Proje kapsamında sadece görüntü iyileştirme yapılmamış, aynı zamanda algoritmaların başarısı Histogram ve CDF (Cumulative Distribution Function) analizleriyle doğrulanmıştır. demo_analysis.py dosyası ile üretilen grafikler şunları kanıtlar:
+
+- Kontrast Yayılımı: CLAHE ve Power-Law yöntemlerinin, dar bir alana sıkışmış piksel değerlerini (düşük kontrast) histogram üzerinde nasıl genişlettiği.
+
+- Parlaklık Değişimi: Histogramın koyu bölgelerden (sol taraf) aydınlık bölgelere (sağ taraf) nasıl kaydırıldığı.
+
+- CDF Doğrusallığı: İşlem sonrası CDF eğrisinin daha lineer hale gelmesi, görüntüdeki bilgi dağılımının dengelendiğini gösterir.
 
 ## 📖 Yöntemler
 
 ### 1. Power-Law Transformation (Gamma Correction)
 
-**Uygulayan:** Enes
+**Uygulayan:** Enes Ayaydın
 
 **Açıklama:**
 Power-Law Transformation, görüntü kontrastını ayarlamak için kullanılan temel bir yöntemdir. Formülü:
@@ -131,19 +145,30 @@ enhanced = power_law_transformation(image, gamma=0.5)
 - γ = 0.8 (hafif parlaklık)
 - γ = 1.0 (orijinal)
 
-### 2. Histogram Equalization
+### 2. CLAHE (Contrast Limited Adaptive Histogram Equalization)
+
+**Uygulayan:** Muhammed Enes Uluç
+
+Burada:
+- `clipLimit`: Kontrast artışı sınırlar
+- `tileGridSize`: Görüntüyü küçük bölgelere ayırır
+
+**Değerinin Etkisi:**
+- ` 2.0 < clipLimit < 4.0`: Yüksek olursa kontrast artar, düşük olursa azalır
+- ` 8,8 < tileGridSize < 16,16`: Küçükse lokal detay artar ama mozaik efekti oluşabilir, büyükse daha global ve yumuşak olur
+
 
 **Açıklama:**
-Histogram Equalization, görüntünün histogramını eşitleyerek kontrastı artırır. Bu yöntem, görüntüdeki piksel değerlerinin dağılımını daha eşit hale getirir.
+CLAHE, görüntüyü küçük bölgelere (tile) ayırarak her birinin histogramını ayrı ayrı eşitler. Böylece kontrast artırılır ve aşırı parlaklık oluşumu sınırlandırılır. Bu yöntem, düşük ışıklı görüntülerde detayların daha iyi görünmesini sağlar.
 
 **Implementasyon:**
 - LAB renk uzayına dönüştürülür
-- Sadece L (Lightness) kanalına histogram eşitleme uygulanır
+- Sadece L (Lightness) kanalına clahe eşitleme uygulanır
 - Tekrar BGR renk uzayına dönüştürülür
 
 **Kod İçinde:**
 ```python
-enhanced = histogram_equalization(image)
+enhanced = clahe_enhancement(image)
 ```
 
 ### 3. Thresholding
@@ -173,11 +198,11 @@ enhanced = thresholding_enhancement(image, threshold_type='adaptive', block_size
 
 ## 🔍 Yöntem Karşılaştırması
 
-| Yöntem | Avantajlar | Dezavantajlar |
-|--------|-----------|---------------|
-| **Power-Law Transformation** | Basit ve hızlı, parametre kontrolü kolay, gamma değeri ile ince ayar yapılabilir | Global uygulama, yerel detayları korumayabilir |
-| **Histogram Equalization** | Otomatik kontrast artışı, histogram dağılımını iyileştirir, renkleri korur | Aşırı kontrast artışı, gürültüyü artırabilir |
-| **Thresholding** | İkili görüntü oluşturur, kenar tespiti için uygun, hızlı, adaptif | Renk bilgisi kaybolur, sadece siyah-beyaz sonuç |
+| Yöntem                       | Avantajlar                                                                               | Dezavantajlar |
+|------------------------------|------------------------------------------------------------------------------------------|---------------|
+| **Power-Law Transformation** | Basit ve hızlı, parametre kontrolü kolay, gamma değeri ile ince ayar yapılabilir         | Global uygulama, yerel detayları korumayabilir |
+| **CLAHE**                    | Lokal kontrast arttırma, düşük ışıkta detayları iyi çıkarır, gürültüyü sınırlı arttırır. | Parametre ayarı gerekir (clipLimit, tileGridSize), küçük tileGridSize ile mozaik efekti oluşabilir.
+| **Thresholding**             | İkili görüntü oluşturur, kenar tespiti için uygun, hızlı, adaptif                        | Renk bilgisi kaybolur, sadece siyah-beyaz sonuç |
 
 ## 📊 Sonuçlar
 
@@ -187,7 +212,7 @@ enhanced = thresholding_enhancement(image, threshold_type='adaptive', block_size
 
 1. **Her yöntem için ayrı klasörler:**
    - `results/dataset_results/power_law/` - Power-Law Transformation sonuçları
-   - `results/dataset_results/histogram/` - Histogram Equalization sonuçları
+   - `results/dataset_results/clahe/` - CLAHE sonuçları
    - `results/dataset_results/thresholding/` - Thresholding sonuçları
 
 2. **Karşılaştırma görselleri:**
@@ -198,7 +223,7 @@ enhanced = thresholding_enhancement(image, threshold_type='adaptive', block_size
 Her görüntü için 4'lü karşılaştırma görseli:
 - Sol: Orijinal görüntü
 - Sağ: Power-Law Transformation (γ=0.5)
-- Sağ: Histogram Equalization
+- Sağ: Clahe Enhancement
 - Sağ: Thresholding (Adaptive)
 
 ## 📸 Veri Seti
@@ -219,8 +244,8 @@ Proje, düşük ışıklı görüntülerden oluşan bir veri seti kullanmaktadı
 
 ## 👥 Katkıda Bulunanlar
 
-- **Enes** - Power-Law Transformation implementasyonu ve proje koordinasyonu
-- **Arkadaş 1** - Histogram Equalization implementasyonu
+- **Enes Ayaydın** - Power-Law Transformation implementasyonu ve proje koordinasyonu
+- **M. Enes Uluc** - Clahe Enhancement implementasyonu
 - **Arkadaş 2** - Thresholding implementasyonu
 
 ## 🔗 Referanslar
@@ -228,7 +253,7 @@ Proje, düşük ışıklı görüntülerden oluşan bir veri seti kullanmaktadı
 1. Gonzalez, R. C., & Woods, R. E. (2017). *Digital Image Processing* (4th ed.). Pearson.
 2. OpenCV Documentation: https://docs.opencv.org/
 3. Thresholding Tutorial: https://docs.opencv.org/4.x/d7/d4d/tutorial_py_thresholding.html
-4. Histogram Equalization: https://docs.opencv.org/4.x/d5/daf/tutorial_py_histogram_equalization.html
+4. Clahe Equalization: https://docs.opencv.org/4.x/d6/db6/classcv_1_1CLAHE.html
 
 ## 📝 Notlar
 
