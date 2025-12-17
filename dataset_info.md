@@ -1,43 +1,43 @@
-# Veri Seti Toplama Rehberi
+# Dataset Collection Guide
 
-## 📸 Veri Seti Nedir?
+## 📸 What Is a Dataset?
 
-Veri seti, projenizde test edeceğiniz **düşük ışıklı görüntülerden** oluşan bir koleksiyondur. Hocanız, yöntemlerinizi farklı görüntüler üzerinde test etmenizi ve sonuçları karşılaştırmanızı istiyor.
+A dataset is a collection of **low-light images** that you will test in your project. Your instructor expects you to test your methods on different images and compare the results.
 
-## 🎯 Toplanması Gereken Görüntü Türleri
+## 🎯 Types of Images to Be Collected
 
-### 1. **Farklı Işık Koşulları**
-- Gece görüntüleri (çok karanlık)
-- Alacakaranlık görüntüleri (orta karanlık)
-- Kapalı alan görüntüleri (az ışık)
-- Gölgeli alanlar
+### 1. **Different Lighting Conditions**
+- Night images (very dark)
+- Twilight images (moderately dark)
+- Indoor images (low light)
+- Shadowed areas
 
-### 2. **Farklı İçerikler**
-- İnsan portreleri
-- Doğa/peyzaj görüntüleri
-- Şehir/şehir manzaraları
-- İç mekan görüntüleri
-- Nesneler/objeler
+### 2. **Different Content Types**
+- Human portraits
+- Nature / landscape images
+- City / cityscape images
+- Indoor scene images
+- Objects / items
 
-### 3. **Farklı Çözünürlükler**
-- Düşük çözünürlük (640x480, 800x600)
-- Orta çözünürlük (1280x720, 1920x1080)
-- Yüksek çözünürlük (daha büyük)
+### 3. **Different Resolutions**
+- Low resolution (640×480, 800×600)
+- Medium resolution (1280×720, 1920×1080)
+- High resolution (larger sizes)
 
-### 4. **Farklı Formatlar**
-- JPG/JPEG
+### 4. **Different Formats**
+- JPG / JPEG
 - PNG
-- (İsteğe bağlı: RAW formatları)
+- (Optional: RAW formats)
 
-## 📊 Önerilen Veri Seti Boyutu
+## 📊 Recommended Dataset Size
 
-- **Minimum**: 10-15 görüntü
-- **İdeal**: 20-30 görüntü
-- **Mükemmel**: 50+ görüntü
+- **Minimum**: 10–15 images
+- **Ideal**: 20–30 images
+- **Excellent**: 50+ images
 
-## 📁 Veri Seti Organizasyonu
+## 📁 Dataset Organization
 
-Önerilen klasör yapısı:
+Recommended folder structure:
 
 ```
 projectSC/
@@ -54,50 +54,51 @@ projectSC/
 │       └── ...
 ```
 
-## 🔍 Görüntü Kaynakları
 
-### 1. **Kendi Çektiğiniz Görüntüler**
-- Telefon/kamera ile düşük ışıkta çekim
-- Farklı senaryolar (gece, kapalı alan, vs.)
+## 🔍 Image Sources
 
-### 2. **Açık Kaynak Veri Setleri**
+### 1. **Images You Capture Yourself**
+- Photos taken with a phone/camera in low-light conditions
+- Different scenarios (night, indoor, etc.)
+
+### 2. **Open-Source Datasets**
 - **LOL Dataset** (Low-Light Dataset)
 - **ExDark Dataset** (Extreme Dark Dataset)
 - **SID Dataset** (See in the Dark)
 - **MIT-Adobe FiveK Dataset**
 
-### 3. **Online Kaynaklar**
-- Unsplash (ücretsiz görüntüler)
-- Pexels (ücretsiz görüntüler)
-- Pixabay (ücretsiz görüntüler)
-- **Not**: Telif hakkına dikkat edin!
+### 3. **Online Resources**
+- Unsplash (free images)
+- Pexels (free images)
+- Pixabay (free images)
+- **Note**: Pay attention to copyright!
 
-## ✅ Veri Seti Kalite Kontrolü
+## ✅ Dataset Quality Control
 
-Topladığınız görüntülerin:
-- ✅ Gerçekten düşük ışıklı olması
-- ✅ Net olması (çok bulanık olmamalı)
-- ✅ Farklı içerikler içermesi
-- ✅ Farklı zorluk seviyelerinde olması
+Ensure that the collected images:
+- ✅ Are genuinely low-light
+- ✅ Are clear (not overly blurry)
+- ✅ Contain diverse content
+- ✅ Represent different difficulty levels
 
-## 📝 Veri Seti Dokümantasyonu
+## 📝 Dataset Documentation
 
-Her görüntü için şu bilgileri kaydedin:
-- Görüntü adı/ID
-- Çekim koşulları (gece, kapalı alan, vs.)
-- Çözünürlük
-- İçerik açıklaması
-- Çekim tarihi (opsiyonel)
+For each image, record the following information:
+- Image name / ID
+- Shooting conditions (night, indoor, etc.)
+- Resolution
+- Content description
+- Capture date (optional)
 
-## 🚀 Sonraki Adımlar
+## 🚀 Next Steps
 
-1. **Görüntüleri toplayın** (10-30 görüntü)
-2. **Klasör yapısını oluşturun**
-3. **Görüntüleri organize edin**
-4. **Veri seti işleme scriptini çalıştırın** (tüm görüntülere yöntemleri uygulayın)
-5. **Sonuçları analiz edin ve raporlayın**
+1. **Collect images** (10–30 images)
+2. **Create the folder structure**
+3. **Organize the images**
+4. **Run the dataset processing script** (apply methods to all images)
+5. **Analyze and report the results**
 
 ---
 
-**Not**: Veri seti toplama, projenizin önemli bir parçasıdır. Farklı görüntüler üzerinde test yapmak, yöntemlerinizin ne kadar iyi çalıştığını göstermenize yardımcı olur.
+**Note**: Dataset collection is a critical part of your project. Testing on diverse images helps demonstrate how well your methods perform.
 

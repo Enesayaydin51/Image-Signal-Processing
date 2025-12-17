@@ -1,88 +1,89 @@
 # Contrast Adjustment Techniques for Low-Light Images
 
-Bu proje, düşük ışıklı görüntüler için farklı kontrast artırma tekniklerini karşılaştırmayı amaçlamaktadır.
+This project aims to compare different contrast enhancement techniques for low-light images.
 
-## 📋 Proje Hakkında
+## 📋 About the Project
 
-Düşük ışıklı görüntülerde kontrast düşüktür ve görüntü kalitesi kötüleşir. Bu projede, görüntü kontrastını artırmak için üç farklı yöntem uygulanmaktadır:
+In low-light images, contrast is low and image quality deteriorates. This project employs three different methods to enhance image contrast:
 
-1. **Power-Law Transformation (Gamma Correction)** - Ana yöntem
-2. **CLAHE (Contrast Limited Adaptive Histogram Equalization)** - CLAHE ile kontrast eşitleme yöntemi
-3. **Adaptive Thresholding** - Lokal eşikleme ile detay çıkarma yöntemi
+1. **Power-Law Transformation (Gamma Correction)** - Main method
+2. **CLAHE (Contrast Limited Adaptive Histogram Equalization)** - Contrast equalization method using CLAHE
 
-## 🔧 Kurulum
+3. **Adaptive Thresholding** - Detail extraction method using local thresholding
 
-### Gereksinimler
+## 🔧 Installation
 
-Projeyi çalıştırmak için aşağıdaki Python kütüphanelerine ihtiyacınız var:
+### Requirements
+
+To run the project, you need the following Python libraries:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Gerekli Kütüphaneler
+### Required Libraries
 
-- `opencv-python` - Görüntü işleme için
-- `numpy` - Sayısal hesaplamalar için
-- `matplotlib` - Görselleştirme için
+- `opencv-python` - For image processing
+- `numpy` - For numerical calculations
+- `matplotlib` - For visualization
 
-## 📁 Proje Yapısı
+## 📁 Project Structure
 
 ```
 projectSC/
 │
-├── main.py                    # Ana Python dosyası (tüm fonksiyonlar)
-├── demo_analysis.py           # Histogram ve CDF analiz grafikleri (Matematiksel analiz)
-├── requirements.txt           # Gerekli kütüphaneler
-├── README.md                  # Bu dosya
-├── dataset_info.md            # Veri seti toplama rehberi
+├── main.py                    # Main Python file (all functions)
+├── demo_analysis.py           # Histogram and CDF analysis plots (Mathematical analysis)
+├── requirements.txt           # required libraries
+├── README.md                  # this file
+├── dataset_info.md            # Dataset collection guide
 │
-├── dataset/                   # Veri seti görüntüleri
-│   └── *.jpg, *.png          # Düşük ışıklı görüntüler
+├── dataset/                   # Dataset images
+│   └── *.jpg, *.png           # Low-light images
 │
-└── results/                   # Sonuçlar (otomatik oluşturulur)
+└── results/                   # Results (automatically generated)
     └── dataset_results/
-        ├── power_law/         # Power-Law Transformation sonuçları
-        ├── clahe/             # CLAHE sonuçları
-        ├── thresholding/      # Adaptive Thresholding sonuçları
-        └── comparisons/       # Karşılaştırma görselleri (orijinal + 3 yöntem)
+        ├── power_law/         # Power-Law Transformation results
+        ├── clahe/             # CLAHE results
+        ├── thresholding/      # Adaptive Thresholding results
+        └── comparisons/       # Comparison images (original + 3 methods)
 ```
 
-## 🚀 Kullanım
+## 🚀 Usage
 
-### 1. Klasör Yapısını Oluşturma (İlk Kez)
+### 1. Create Folder Structure (First Time)
 
 ```bash
 python main.py --create
 ```
 
-Bu komut gerekli klasörleri oluşturur.
+This command creates the required directories.
 
-### 2. Görüntüleri Hazırlama
+### 2. Prepare Images
 
-Düşük ışıklı görüntülerinizi `dataset/` klasörüne ekleyin.
+Add your low-light images to the `dataset/` folder
 
-### 3. Veri Setini İşleme
+### 3. Process the Dataset
 
 Tüm görüntülere yöntemleri uygulayın:
 
 ```bash
 python main.py
 ```
-Seçilen görüntüler üzerinde yöntemleri uygulayıp, histogramlarını çizin:
+Apply the methods to all images and plot their histograms:
 ```bash
 python demo_analysis.py
 ```
 
-Bu komut:
-- `dataset/` klasöründeki tüm görüntüleri işler
-- Her görüntü için 3 yöntem uygular
-- Sonuçları `results/dataset_results/` klasörüne kaydeder
-- Her görüntü için karşılaştırma görseli oluşturur (orijinal + 3 yöntem yan yana)
+This command:
+- Processes all images in the `dataset/` folder
+- Applies 3 methods to each image
+- Saves results to the `results/dataset_results/` folder
+- Creates comparison images for each input (original + 3 methods side by side)
 
-### Tek Görüntü İşleme
+### Single Image Processing
 
-Eğer tek bir görüntü üzerinde test yapmak isterseniz:
+If you want to test on a single image:
 
 ```python
 from main import (
@@ -92,183 +93,186 @@ from main import (
     load_image
 )
 
-# Görüntüyü yükle
-image = load_image("dataset/ornek_resim.jpg")  # Dosya yolunu kendinize göre düzenleyin
+#  Load image
+image = load_image("dataset/ornek_resim.jpg")  # Adjust the file path as needed
 
-# Yöntemleri uygula
+# Apply methods
 enhanced_power_law = power_law_transformation(image, gamma=0.5)
 clahe_hist = clahe_enhancement(image)
 enhanced_threshold = thresholding_enhancement(image, threshold_type='adaptive', C=2)
 ```
-## 📈 Analiz ve Histogram Değerlendirmesi
+## 📈 Analysis and Histogram Evaluation
 
-Proje kapsamında sadece görüntü iyileştirme yapılmamış, aynı zamanda algoritmaların başarısı Histogram ve CDF (Cumulative Distribution Function) analizleriyle doğrulanmıştır. demo_analysis.py dosyası ile üretilen grafikler şunları kanıtlar:
+Within the scope of the project, not only image enhancement was performed, but the success of the algorithms was also validated using Histogram and CDF (Cumulative Distribution Function) analysis. The plots generated by demo_analysis.py demonstrate the following:
 
-- Kontrast Yayılımı: CLAHE ve Power-Law yöntemlerinin, dar bir alana sıkışmış piksel değerlerini (düşük kontrast) histogram üzerinde nasıl genişlettiği.
+- Contrast Distribution: How CLAHE and Power-Law methods expand pixel values that were compressed into a narrow range (low contrast) across the histogram.
 
-- Parlaklık Değişimi: Histogramın koyu bölgelerden (sol taraf) aydınlık bölgelere (sağ taraf) nasıl kaydırıldığı.
+- Brightness Shift: How the histogram shifts from darker regions (left side) to brighter regions (right side).
 
-- CDF Doğrusallığı: İşlem sonrası CDF eğrisinin daha lineer hale gelmesi, görüntüdeki bilgi dağılımının dengelendiğini gösterir.
+- CDF Linearity: A more linear CDF curve after processing indicates a more balanced distribution of image information.
 
-- Nesne Ayrıştırma (Segmentation): Adaptive Thresholding yönteminin, histogramı uç noktalara (Siyah ve Beyaz) toplayarak nesneleri arka plandan nasıl net bir şekilde ayırdığı.
+- Object Segmentation: Adaptive Thresholding gathers histogram values at extreme ends (black and white), clearly separating objects from the background.
 
-## 📖 Yöntemler
+## 📖 Methods
 
 ### 1. Power-Law Transformation (Gamma Correction)
 
-**Uygulayan:** Enes Ayaydın
+**Implemented by:** Enes Ayaydın
 
-**Açıklama:**
-Power-Law Transformation, görüntü kontrastını ayarlamak için kullanılan temel bir yöntemdir. Formülü:
+**Description:**
+Power-Law Transformation is a basic method used to adjust image contrast. The formula is:
 
 ```
 s = c * r^γ
 ```
 
-Burada:
-- `s`: Çıkış piksel değeri
-- `r`: Giriş piksel değeri
-- `c`: Sabit (genellikle 1)
-- `γ`: Gamma değeri
+where:
+- `s`: Output pixel value
+- `r`: Input pixel value
+- `c`: Constant (usually 1)
+- `γ`: Gamma value
 
-**Gamma Değerinin Etkisi:**
-- `γ < 1`: Görüntüyü parlaklaştırır (düşük ışıklı görüntüler için uygun)
-- `γ = 1`: Değişiklik yapmaz
-- `γ > 1`: Görüntüyü koyulaştırır
+**Effect of Gamma Value:**
+- `γ < 1`: Brightens the image (suitable for low-light images)
+- `γ = 1`: No change
+- `γ > 1`: Darkens the image
 
-**Kod İçinde:**
+**In Code:**
 ```python
 enhanced = power_law_transformation(image, gamma=0.5)
 ```
 
-**Test Edilen Gamma Değerleri:**
-- γ = 0.2 (en parlak)
-- γ = 0.5 (orta parlaklık)
-- γ = 0.8 (hafif parlaklık)
-- γ = 1.0 (orijinal)
+**Tested Gamma Values:**
+- γ = 0.2 (brightest)
+- γ = 0.5 (medium brightness)
+- γ = 0.8 (slight brightness)
+- γ = 1.0 (original)
 
 ### 2. CLAHE (Contrast Limited Adaptive Histogram Equalization)
 
-**Uygulayan:** Muhammed Enes Uluç
+**Implemented by:** Muhammed Enes Uluç
 
-Burada:
-- `clipLimit`: Kontrast artışı sınırlar
-- `tileGridSize`: Görüntüyü küçük bölgelere ayırır
+Where:
+- `clipLimit`: Limits contrast amplification
+- `tileGridSize`: Divides the image into small regions
 
-**Değerinin Etkisi:**
-- ` 2.0 < clipLimit < 4.0`: Yüksek olursa kontrast artar, düşük olursa azalır
-- ` 8,8 < tileGridSize < 16,16`: Küçükse lokal detay artar ama mozaik efekti oluşabilir, büyükse daha global ve yumuşak olur
+**Effect of Parameters:**
+- ` 2.0 < clipLimit < 4.0`: Higher values increase contrast; lower values decrease it
+- ` 8,8 < tileGridSize < 16,16`: Smaller values increase local detail but may cause mosaic artifacts; larger values produce smoother, more global results
 
 
-**Açıklama:**
-CLAHE, görüntüyü küçük bölgelere (tile) ayırarak her birinin histogramını ayrı ayrı eşitler. Böylece kontrast artırılır ve aşırı parlaklık oluşumu sınırlandırılır. Bu yöntem, düşük ışıklı görüntülerde detayların daha iyi görünmesini sağlar.
+**Description:**
+CLAHE divides the image into small tiles and equalizes each tile’s histogram independently. This enhances contrast while limiting excessive brightness. This method is especially effective for low-light images.
 
-**Implementasyon:**
-- LAB renk uzayına dönüştürülür
-- Sadece L (Lightness) kanalına clahe eşitleme uygulanır
-- Tekrar BGR renk uzayına dönüştürülür
+**Implementation:**
+- Convert the image to LAB color space
+- Apply CLAHE only to the L (Lightness) channel
+- Convert back to BGR color space
 
-**Kod İçinde:**
+**In Code:**
 ```python
 enhanced = clahe_enhancement(image)
 ```
 
 ### 3. Thresholding
 
-**Uygulayan:** Büşra Yıldız
+**Implemented by:** Büşra Yıldız
 
-**Açıklama:**
-Standart eşikleme yöntemleri görüntüyü siyah-beyaz yapar. projede uygulanan yöntem, Görüntüyü B, G, R (Mavi, Yeşil, Kırmızı) renk kanallarına ayırır ve her kanala bağımsız olarak Adaptive Threshold uygular. Sonuçlar tekrar birleştirildiğinde, düşük ışıklı bölgelerdeki detaylar keskinleşir ve görüntü tamamen siyah-beyaz olmak yerine renk bilgisini  bir şekilde korur.
+**Description:**
+Standard thresholding methods convert images to black and white. In this project, the image is split into B, G, R (Blue, Green, Red) channels, and Adaptive Thresholding is applied independently to each channel. The results are merged, sharpening details in low-light regions while partially preserving color information.
 
-**Thresholding Türleri:**
-- **Adaptive Thresholding**: Her piksel için komşu piksellerin ağırlıklı ortalamasını (Gaussian) kullanır.
-- **Otsu's Thresholding**: Otomatik olarak uygun eşik değerini belirler
-- **Binary Thresholding**: Sabit bir eşik değeri ile standart eşikleme yapar.
+Thresholding Types:
 
-**Implementasyon:**
-- Her BGR kanalına ayrı ayrı thresholding uygulanır
-- Sonuçlar birleştirilerek renkli görüntü oluşturulur
+**Thresholding Types:**
+- **Adaptive Thresholding**: Uses weighted (Gaussian) local neighborhood averages
+- **Otsu's Thresholding**: Automatically determines the optimal threshold
+- **Binary Thresholding**: Uses a fixed threshold value
 
-**Parametreler:**
-- `threshold_type`: 'adaptive', 'otsu', veya 'binary' (varsayılan: 'adaptive')
+**Implementation:**
+- Apply thresholding independently to each BGR channel
+- Merge the results to form a color image
+
+**Parameters:**
+- `threshold_type`: 'adaptive', 'otsu', veya 'binary' (default: 'adaptive')
 - `C`: Adaptive threshold için sabit değer (varsayılan: 2)
-*(Not: `block_size` ve `max_value` optimum sonuç için kod içerisine sabitlenmiştir.)*
+*(Note: block_size and max_value are fixed in the code for optimal results.)*
 
-**Kod İçinde:**
+**In Code:**
 ```python
 enhanced_threshold = thresholding_enhancement(image, threshold_type='adaptive', C=2)
 ```
-| Yöntem                       | Avantajlar                                                                               | Dezavantajlar |
-|------------------------------|------------------------------------------------------------------------------------------|---------------|
-| **Power-Law Transformation** | Basit ve hızlı, parametre kontrolü kolay, gamma değeri ile ince ayar yapılabilir         | Global uygulama, yerel detayları korumayabilir |
-| **CLAHE**                    | Lokal kontrast arttırma, düşük ışıkta detayları iyi çıkarır, gürültüyü sınırlı arttırır. | Parametre ayarı gerekir (clipLimit, tileGridSize), küçük tileGridSize ile mozaik efekti oluşabilir.
-| **Thresholding**             | Gölge ve ışıktaki değişimlere tam uyum sağlar, kenarları ve sınırları çok net çizer.     | Renk bilgisi kaybolur, sadece siyah-beyaz sonuç; kenar tespiti için uygun, hızlı, adaptif |
+| Method                       | Advantages                                                                                     | Disadvantages |
+|------------------------------|------------------------------------------------------------------------------------------------|---------------|
+| **Power-Law Transformation** | Simple and fast, easy parameter control, allows fine tuning via the gamma value               | Global operation; may not preserve local details |
+| **CLAHE**                    | Enhances local contrast, reveals details well in low-light conditions, limits noise increase | Requires parameter tuning (clipLimit, tileGridSize); small tileGridSize may cause mosaic artifacts |
+| **Thresholding**             | Fully adapts to changes in shadow and illumination, produces very sharp edges and boundaries | Color information is lost; produces only black-and-white output; suitable for edge detection; fast and adaptive |
 
 
-## 📊 Sonuçlar
+## 📊 Results
 
-### Veri Seti İşleme Sonuçları
+### Dataset Processing Results
 
-`main.py` çalıştırıldığında:
+When `main.py` is executed:
 
-1. **Her yöntem için ayrı klasörler:**
-   - `results/dataset_results/power_law/` - Power-Law Transformation sonuçları
-   - `results/dataset_results/clahe/` - CLAHE sonuçları
-   - `results/dataset_results/thresholding/` - Adaptive Thresholding sonuçları
+1. **Separate folders for each method:**
+   - `results/dataset_results/power_law/` – Power-Law Transformation results
+   - `results/dataset_results/clahe/` – CLAHE results
+   - `results/dataset_results/thresholding/` – Adaptive Thresholding results
 
-2. **Karşılaştırma görselleri:**
-   - `results/dataset_results/comparisons/` - Her görüntü için orijinal + 3 yöntem yan yana
+2. **Comparison images:**
+   - `results/dataset_results/comparisons/` – Original image + 3 methods side by side for each image
 
-### Örnek Çıktı
+### Sample Output
 
-Her görüntü için 4'lü karşılaştırma görseli:
-- Sol: Orijinal görüntü
-- Sağ: Power-Law Transformation (γ=0.5)
-- Sağ: Clahe Enhancement
-- Sağ: Adaptive Thresholding 
+For each image, a 4-panel comparison image:
+- Left: Original image
+- Right: Power-Law Transformation (γ = 0.5)
+- Right: CLAHE Enhancement
+- Right: Adaptive Thresholding
 
-## 📸 Veri Seti
+## 📸 Dataset
 
-Proje, düşük ışıklı görüntülerden oluşan bir veri seti kullanmaktadır. Veri seti toplama rehberi için `dataset_info.md` dosyasına bakın.
+The project uses a dataset consisting of low-light images. For dataset collection guidelines, refer to the `dataset_info.md` file.
 
-**Önerilen Veri Seti:**
-- 10-30 düşük ışıklı görüntü
-- Farklı senaryolar (gece, kapalı alan, gölgeli alanlar)
-- Farklı içerikler (portre, doğa, şehir, iç mekan)
+**Recommended Dataset:**
+- 10–30 low-light images
+- Different scenarios (night, indoor, shadowed areas)
+- Different content types (portrait, nature, city, indoor scenes)
 
-## 📝 Dosya Açıklamaları
 
-- **main.py**: Tüm kontrast artırma fonksiyonları ve veri seti işleme kodunu içeren ana dosya
-- **requirements.txt**: Gerekli Python kütüphaneleri
-- **dataset_info.md**: Veri seti toplama ve hazırlama rehberi
-- **README.md**: Bu dosya
-- **report.pdf**: Proje raporu
+## 📝 File Descriptions
 
-## 👥 Katkıda Bulunanlar
+- **main.py**: Main file containing all contrast enhancement functions and dataset processing code
+- **requirements.txt**: Required Python libraries
+- **dataset_info.md**: Dataset collection and preparation guide
+- **README.md**: This file
+- **report.pdf**: Project report
 
-- **Enes Ayaydın** - Power-Law Transformation implementasyonu ve proje koordinasyonu
-- **M. Enes Uluc** - Clahe Enhancement implementasyonu
-- **Büşra Yıldız** - Thresholding implementasyonu
+## 👥 Contributors
 
-## 🔗 Referanslar
+- **Enes Ayaydın** – Power-Law Transformation implementation and project coordination
+- **M. Enes Uluc** – CLAHE Enhancement implementation
+- **Büşra Yıldız** – Thresholding implementation
+
+## 🔗 References
 
 1. Gonzalez, R. C., & Woods, R. E. (2017). *Digital Image Processing* (4th ed.). Pearson.
 2. OpenCV Documentation: https://docs.opencv.org/
 3. Thresholding Tutorial: https://docs.opencv.org/4.x/d7/d4d/tutorial_py_thresholding.html
 4. Clahe Equalization: https://docs.opencv.org/4.x/d6/db6/classcv_1_1CLAHE.html
 
-## 📝 Notlar
+## 📝 Notes
 
-- Görüntü dosyası BGR formatında yüklenir (OpenCV standardı)
-- Tüm görselleştirmeler RGB formatında gösterilir (matplotlib için)
-- Gamma değerini ihtiyacınıza göre ayarlayabilirsiniz
-- Farklı görüntüler için farklı parametreler daha iyi sonuç verebilir
-- Veri seti işleme için `python main.py` komutunu kullanın
+- Image files are loaded in BGR format (OpenCV standard)
+- All visualizations are displayed in RGB format (for matplotlib)
+- You can adjust the gamma value according to your needs
+- Different images may yield better results with different parameter settings
+- Use the `python main.py` command for dataset processing
 
-## 📄 Lisans
+## 📄 License
 
-Bu proje eğitim amaçlıdır.
+This project is for educational purposes only.
 
 ---
 
-**İyi çalışmalar! 🚀**
+**Good luck with your work! 🚀**
