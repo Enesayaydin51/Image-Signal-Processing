@@ -80,50 +80,59 @@ def clahe_enhancement(image):
     return clahe_image
 
 
-def thresholding_enhancement(image, threshold_type='adaptive', max_value=255, block_size=11, C=2):
+def thresholding_enhancement(image, threshold_type='adaptive', C=2):
     """
-    Thresholding ile kontrast artırma
-    Bu yöntem eşik değeri (threshold) kullanarak kontrastı artırır.
-    
+    Adaptive Thresholding yöntemi ile kontrast artırma
+    Uygulayan: Büşra Yıldız
+
+    Bu yöntem ile görüntü renk kanallarına ayırlıp her kanala ayrı ayrı eşikleme uygulanarak
+    düşük ışıkta kaybolan detaylar ve keskin sınırlar net bi şekilde ortaya çıkarılır
+    ve böylece kontrastı arttırılır.
+ 
     Parametreler:
     ------------
     image : numpy.ndarray
-        Giriş görüntüsü (BGR formatında)
+        Giriş görüntüsü (OpenCV standardı BGR formatında).
     threshold_type : str
-        Threshold tipi: 'adaptive', 'otsu', veya 'binary' (varsayılan: 'adaptive')
-    max_value : int
-        Maksimum piksel değeri (varsayılan: 255)
-    block_size : int
-        Adaptive threshold için blok boyutu (varsayılan: 11, tek sayı olmalı)
+        Threshold tipi: 'adaptive' (Önerilen), 'otsu', veya 'binary'
     C : int
-        Adaptive threshold için sabit değer (varsayılan: 2)
+        Adaptive threshold için sabit katsayı (Gürültü temizlemek için ortalamadan çıkarılan değer).
     
     Döndürür:
     --------
     enhanced_image : numpy.ndarray
-        Kontrast artırılmış görüntü
+        Kontrast artırılmış ve detayları belirginleştirilmiş görüntü 
     """
-    # Yöntem: Her BGR kanalına ayrı ayrı thresholding uygula
-    # Bu yöntem renkli görüntüler için daha iyi sonuç verir
-    b, g, r = cv2.split(image)
+    max_val = 255
+    block = 11   # Sabit değer (Değiştirmek istersen buradan değiştirirsin)
+    # tek bir kanala (gri tonlamalı katman) işlem yapan yardımcı method
+    def apply_threshold(channel):
+        if threshold_type == 'adaptive':
+            # Adaptive Gaussian: Komşuların ağırlıklı ortalamasına göre lokal eşik belirler
+            return cv2.adaptiveThreshold(
+                channel, max_val, 
+                cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+                cv2.THRESH_BINARY, 
+                block, C
+            )
+        elif threshold_type == 'otsu':
+            # Histogram dağılımına bakarak otomatik global eşikleme
+            _, result = cv2.threshold(channel, 0, max_val, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            return result
+        else:
+            # Belirlenmiş sabit değerle standart sabit eşikleme yapar
+            _, result = cv2.threshold(channel, 127, max_val, cv2.THRESH_BINARY)
+            return result
+
+    # 1. Görüntüyü B-G-R kanallarına ayırır
+    channels = cv2.split(image)
     
-    if threshold_type == 'adaptive':
-        b_thresh = cv2.adaptiveThreshold(b, max_value, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-                                         cv2.THRESH_BINARY, block_size, C)
-        g_thresh = cv2.adaptiveThreshold(g, max_value, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-                                         cv2.THRESH_BINARY, block_size, C)
-        r_thresh = cv2.adaptiveThreshold(r, max_value, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-                                         cv2.THRESH_BINARY, block_size, C)
-    elif threshold_type == 'otsu':
-        _, b_thresh = cv2.threshold(b, 0, max_value, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        _, g_thresh = cv2.threshold(g, 0, max_value, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        _, r_thresh = cv2.threshold(r, 0, max_value, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    else:  # binary
-        _, b_thresh = cv2.threshold(b, 127, max_value, cv2.THRESH_BINARY)
-        _, g_thresh = cv2.threshold(g, 127, max_value, cv2.THRESH_BINARY)
-        _, r_thresh = cv2.threshold(r, 127, max_value, cv2.THRESH_BINARY)
+    # 2. Her kanala seçilen threshold yöntemini ayrı ayrı uygula
+    processed_channels = [apply_threshold(ch) for ch in channels]
     
-    enhanced_image = cv2.merge([b_thresh, g_thresh, r_thresh])
+    # 3. işlenmmiş kanalları tekrar birleştir
+    enhanced_image = cv2.merge(processed_channels)
+    
     return enhanced_image
 
 
@@ -274,8 +283,8 @@ def process_dataset(dataset_folder="dataset", output_folder="results/dataset_res
                 enhanced_clahe
             )
             
-            # 3. Thresholding
-            enhanced_threshold = thresholding_enhancement(image, threshold_type='adaptive')
+            # 3. Thresholding Enhancement
+            enhanced_threshold = thresholding_enhancement(image, threshold_type='adaptive', C=2)
             cv2.imwrite(
                 f"{output_folder}/thresholding/{image_name_no_ext}_thresholding.jpg",
                 enhanced_threshold

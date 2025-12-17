@@ -8,7 +8,7 @@ Düşük ışıklı görüntülerde kontrast düşüktür ve görüntü kalitesi
 
 1. **Power-Law Transformation (Gamma Correction)** - Ana yöntem
 2. **CLAHE (Contrast Limited Adaptive Histogram Equalization)** - CLAHE ile kontrast eşitleme yöntemi
-3. **Thresholding** - Eşik değeri yöntemi
+3. **Adaptive Thresholding** - Lokal eşikleme ile detay çıkarma yöntemi
 
 ## 🔧 Kurulum
 
@@ -44,7 +44,7 @@ projectSC/
     └── dataset_results/
         ├── power_law/         # Power-Law Transformation sonuçları
         ├── clahe/             # CLAHE sonuçları
-        ├── thresholding/      # Thresholding sonuçları
+        ├── thresholding/      # Adaptive Thresholding sonuçları
         └── comparisons/       # Karşılaştırma görselleri (orijinal + 3 yöntem)
 ```
 
@@ -93,12 +93,12 @@ from main import (
 )
 
 # Görüntüyü yükle
-image = load_image("your_image.jpg")
+image = load_image("dataset/ornek_resim.jpg")  # Dosya yolunu kendinize göre düzenleyin
 
 # Yöntemleri uygula
 enhanced_power_law = power_law_transformation(image, gamma=0.5)
 clahe_hist = clahe_enhancement(image)
-enhanced_threshold = thresholding_enhancement(image, threshold_type='adaptive')
+enhanced_threshold = thresholding_enhancement(image, threshold_type='adaptive', C=2)
 ```
 ## 📈 Analiz ve Histogram Değerlendirmesi
 
@@ -109,6 +109,8 @@ Proje kapsamında sadece görüntü iyileştirme yapılmamış, aynı zamanda al
 - Parlaklık Değişimi: Histogramın koyu bölgelerden (sol taraf) aydınlık bölgelere (sağ taraf) nasıl kaydırıldığı.
 
 - CDF Doğrusallığı: İşlem sonrası CDF eğrisinin daha lineer hale gelmesi, görüntüdeki bilgi dağılımının dengelendiğini gösterir.
+
+- Nesne Ayrıştırma (Segmentation): Adaptive Thresholding yönteminin, histogramı uç noktalara (Siyah ve Beyaz) toplayarak nesneleri arka plandan nasıl net bir şekilde ayırdığı.
 
 ## 📖 Yöntemler
 
@@ -173,13 +175,15 @@ enhanced = clahe_enhancement(image)
 
 ### 3. Thresholding
 
+**Uygulayan:** Büşra Yıldız
+
 **Açıklama:**
-Thresholding (Eşik Değeri), görüntüdeki pikselleri belirli bir eşik değerine göre ikili (binary) hale getirerek kontrastı artırır. Adaptive Thresholding, görüntünün farklı bölgeleri için farklı eşik değerleri kullanarak daha iyi sonuçlar verir.
+Standart eşikleme yöntemleri görüntüyü siyah-beyaz yapar. projede uygulanan yöntem, Görüntüyü B, G, R (Mavi, Yeşil, Kırmızı) renk kanallarına ayırır ve her kanala bağımsız olarak Adaptive Threshold uygular. Sonuçlar tekrar birleştirildiğinde, düşük ışıklı bölgelerdeki detaylar keskinleşir ve görüntü tamamen siyah-beyaz olmak yerine renk bilgisini  bir şekilde korur.
 
 **Thresholding Türleri:**
-- **Adaptive Thresholding**: Her piksel için komşu piksellerin ortalamasına göre eşik değeri belirler
-- **Otsu's Thresholding**: Otomatik olarak optimal eşik değerini belirler
-- **Binary Thresholding**: Sabit bir eşik değeri kullanır
+- **Adaptive Thresholding**: Her piksel için komşu piksellerin ağırlıklı ortalamasını (Gaussian) kullanır.
+- **Otsu's Thresholding**: Otomatik olarak uygun eşik değerini belirler
+- **Binary Thresholding**: Sabit bir eşik değeri ile standart eşikleme yapar.
 
 **Implementasyon:**
 - Her BGR kanalına ayrı ayrı thresholding uygulanır
@@ -187,22 +191,19 @@ Thresholding (Eşik Değeri), görüntüdeki pikselleri belirli bir eşik değer
 
 **Parametreler:**
 - `threshold_type`: 'adaptive', 'otsu', veya 'binary' (varsayılan: 'adaptive')
-- `max_value`: Maksimum piksel değeri (varsayılan: 255)
-- `block_size`: Adaptive threshold için blok boyutu (varsayılan: 11)
 - `C`: Adaptive threshold için sabit değer (varsayılan: 2)
+*(Not: `block_size` ve `max_value` optimum sonuç için kod içerisine sabitlenmiştir.)*
 
 **Kod İçinde:**
 ```python
-enhanced = thresholding_enhancement(image, threshold_type='adaptive', block_size=11, C=2)
+enhanced_threshold = thresholding_enhancement(image, threshold_type='adaptive', C=2)
 ```
-
-## 🔍 Yöntem Karşılaştırması
-
 | Yöntem                       | Avantajlar                                                                               | Dezavantajlar |
 |------------------------------|------------------------------------------------------------------------------------------|---------------|
 | **Power-Law Transformation** | Basit ve hızlı, parametre kontrolü kolay, gamma değeri ile ince ayar yapılabilir         | Global uygulama, yerel detayları korumayabilir |
 | **CLAHE**                    | Lokal kontrast arttırma, düşük ışıkta detayları iyi çıkarır, gürültüyü sınırlı arttırır. | Parametre ayarı gerekir (clipLimit, tileGridSize), küçük tileGridSize ile mozaik efekti oluşabilir.
-| **Thresholding**             | İkili görüntü oluşturur, kenar tespiti için uygun, hızlı, adaptif                        | Renk bilgisi kaybolur, sadece siyah-beyaz sonuç |
+| **Thresholding**             | Gölge ve ışıktaki değişimlere tam uyum sağlar, kenarları ve sınırları çok net çizer.     | Renk bilgisi kaybolur, sadece siyah-beyaz sonuç; kenar tespiti için uygun, hızlı, adaptif |
+
 
 ## 📊 Sonuçlar
 
@@ -213,7 +214,7 @@ enhanced = thresholding_enhancement(image, threshold_type='adaptive', block_size
 1. **Her yöntem için ayrı klasörler:**
    - `results/dataset_results/power_law/` - Power-Law Transformation sonuçları
    - `results/dataset_results/clahe/` - CLAHE sonuçları
-   - `results/dataset_results/thresholding/` - Thresholding sonuçları
+   - `results/dataset_results/thresholding/` - Adaptive Thresholding sonuçları
 
 2. **Karşılaştırma görselleri:**
    - `results/dataset_results/comparisons/` - Her görüntü için orijinal + 3 yöntem yan yana
@@ -224,7 +225,7 @@ Her görüntü için 4'lü karşılaştırma görseli:
 - Sol: Orijinal görüntü
 - Sağ: Power-Law Transformation (γ=0.5)
 - Sağ: Clahe Enhancement
-- Sağ: Thresholding (Adaptive)
+- Sağ: Adaptive Thresholding 
 
 ## 📸 Veri Seti
 
@@ -241,12 +242,13 @@ Proje, düşük ışıklı görüntülerden oluşan bir veri seti kullanmaktadı
 - **requirements.txt**: Gerekli Python kütüphaneleri
 - **dataset_info.md**: Veri seti toplama ve hazırlama rehberi
 - **README.md**: Bu dosya
+- **report.pdf**: Proje raporu
 
 ## 👥 Katkıda Bulunanlar
 
 - **Enes Ayaydın** - Power-Law Transformation implementasyonu ve proje koordinasyonu
 - **M. Enes Uluc** - Clahe Enhancement implementasyonu
-- **Arkadaş 2** - Thresholding implementasyonu
+- **Büşra Yıldız** - Thresholding implementasyonu
 
 ## 🔗 Referanslar
 
